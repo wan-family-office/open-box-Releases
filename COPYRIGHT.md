@@ -1,18 +1,18 @@
-# Open-Box 版权与许可范围
+# Open-Box copyright and licensing scope
 
-Open-Box 自有程序按闭源专有软件分发，适用 [LICENSE](LICENSE)。公开仓库用于提供官方发行版、部署脚本、文档和问题反馈；公开可下载不代表自有实现获得开源授权。
+Open-Box's own programs are distributed as closed-source proprietary software under [LICENSE](LICENSE). The public repository provides official releases, deployment scripts, documentation and issue reporting; being publicly downloadable does not grant an open-source licence to Open-Box's own implementation.
 
-未经许可，禁止复制传播自有代码、再分发或销售自有程序、制作换名或重新打包的衍生产品、反编译、反汇编、逆向恢复自有实现及绕过授权。允许用户在自己的设备上正常安装、离线使用、升级、备份和恢复；适用法律不可排除的权利不受限制。
+Without permission, you may not copy or distribute Open-Box's own code, redistribute or sell its programs, make renamed or repackaged derivative products, decompile, disassemble or reverse-engineer its implementation, or bypass licensing. Users may install, use offline, upgrade, back up and restore it on their own devices; rights that applicable law does not allow to be excluded are not limited.
 
-## 第三方组件与既有许可
+## Third-party components and existing licences
 
-- 面板前端由 Wan Family 基于 zashboard 二次开发。zashboard 的原始代码保留 MIT 许可，原始版权及许可全文随包保留为 `panel/server/resources/licenses/panel.LICENSE`。Open-Box 的声明不限制 MIT 已授予的权利。
-- sing-box 内核保留其 GPL 许可，随包提供 `bin/sing-box.LICENSE`，每个官方 Release 同时提供对应的内核源码、补丁及构建资料附件。该内核的使用、修改、复制及再分发权利按其原许可处理。
-- Node.js、Go 运行时、Go 模块、面板依赖、规则数据库及 Docker 基础镜像中的其他第三方组件按各自许可证授权。随组件保留原始许可证及版权声明。
-- `panel/server/resources/licenses/open-box.LICENSE` 和 `open-box.COPYRIGHT.md` 是自有程序的许可及本说明副本，程序组件升级也保留这些文件。
+- The panel front end is developed by Wan Family on top of zashboard. zashboard's original code keeps its MIT licence; the original copyright notice and full licence text ship as `panel/server/resources/licenses/panel.LICENSE`. Open-Box's terms do not limit rights already granted under MIT.
+- The sing-box kernel keeps its GPL licence and ships with `bin/sing-box.LICENSE`; every official release also provides the matching kernel source, patches and build materials as attachments. Rights to use, modify, copy and redistribute the kernel follow its original licence.
+- Other third-party components, including Node.js, the Go runtime, Go modules, panel dependencies, rule databases and the Docker base image, are licensed under their own licences. Their original licences and copyright notices are kept with each component.
+- `panel/server/resources/licenses/open-box.LICENSE` and `open-box.COPYRIGHT.md` are copies of the licence and of this notice for Open-Box's own programs; component upgrades keep these files.
 
-本次声明随 v0.1.321 起的发行版提供，只覆盖 Open-Box 权利人有权许可的自有部分，不把第三方组件改为闭源，也不追溯撤销任何旧版本或其他材料已经授予的许可。涉及旧版本的版权争议，应核对相应文件的来源、发布时许可和具体复制内容。
+This notice ships with releases from v0.1.321 onward. It covers only the parts the Open-Box rights holder is entitled to license; it does not make third-party components closed source and does not retroactively revoke any licence already granted for earlier versions or other material. Copyright questions about earlier versions should be settled by checking the origin of the files concerned, the licence they were released under and what was actually copied.
 
-## 官方来源
+## Official source
 
-Open-Box 是 Wan Family 的项目，官方源码仓库为 `wan-family-office/open-box`（不对外公开）。官方发行版、部署脚本和文档在公开仓库 [wan-family-office/open-box-releases](https://github.com/wan-family-office/open-box-releases) 发布。转载文档或使用公开脚本不构成获得自有程序源码、品牌或衍生发行授权。
+Open-Box is a Wan Family project. The official source repository is `wan-family-office/open-box` (not public). Official releases, deployment scripts and documentation are published in the public repository [wan-family-office/open-box-releases](https://github.com/wan-family-office/open-box-releases). Reposting the documentation or using the public scripts does not grant any licence to Open-Box's source code, brand or derivative releases.

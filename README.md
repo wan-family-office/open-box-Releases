@@ -3,177 +3,166 @@
   <img src="docs/pic/logo.png" alt="Open-Box" height="72">
 </picture>
 
-Open-Box 是 Wan Family 的项目，分两部分：**路由器端**装在路由器 / 主机上，是一体化透明代理——安装包内置 Open-Box、sing-box 内核、Node 运行时以及完整 GeoSite / GeoIP 数据，安装后通过浏览器完成订阅、节点、分流、DNS 和防火墙设置，不需要手写配置文件；**客户端**是手机、电脑上的 Open-Box App，和家里的路由器端配对，在外面也按同一套规则分流。
+Open-Box is a Wan Family project with two parts. The **router side** runs on a router / host and is an all-in-one transparent proxy: the package bundles Open-Box, the sing-box core, a Node runtime and the full GeoSite / GeoIP data, and after installation you set up subscriptions, nodes, routing, DNS and the firewall in a browser, with no configuration files to write by hand. The **clients** are the Open-Box apps for phones and computers; they pair with the router side at home and route traffic by the same rules when you are away.
 
-**Open-Box 自有程序为闭源专有软件，并非开源项目。未经许可禁止复制传播自有代码、再分发、反编译及绕过授权。** 正常安装、离线使用、升级、备份和恢复允许；第三方开源组件保留原许可。详见 [LICENSE](LICENSE) 和 [版权范围](COPYRIGHT.md)。
+**Open-Box's own programs are closed-source proprietary software, not an open-source project. Copying or distributing its own code, redistribution, decompilation and circumventing licensing are prohibited without permission.** Normal installation, offline use, upgrades, backups and restores are allowed; third-party open-source components keep their original licenses. See [LICENSE](LICENSE) and the [copyright scope](COPYRIGHT.md).
 
-**支持的平台**
+**Supported platforms**
 
-路由器端（同一份安装包、同一条安装命令，脚本自己识别系统），见[路由器端](#路由器端)：
+Router side (one package and one install command; the script detects the system), see [Router side](#router-side):
 
-- **OpenWrt**（含 iStoreOS、ImmortalWrt 等衍生固件）：x86_64、aarch64；主路由或旁路由都行，带 LuCI 页面
-- **Debian / Ubuntu**（需要 systemd；Ubuntu 24.04 验证过）：x86_64、aarch64；作为旁路由或只给本机用，没有 LuCI 和 dnsmasq 分流，见[安装](#安装)里的 Debian / Ubuntu 一节
-- **Docker 旁路由**（Linux Docker Engine）：x86_64、aarch64；容器通过 macvlan / ipvlan L2 获取独立 LAN IP，支持一键安装、离线镜像和 `docker run`；新装默认端口 3036，升级保留原端口，见 [Docker 部署说明](docker/README.md)
+- **OpenWrt** (including derivative firmware such as iStoreOS and ImmortalWrt): x86_64, aarch64; works as the main router or a side router, with a LuCI page
+- **Debian / Ubuntu** (requires systemd; verified on Ubuntu 24.04): x86_64, aarch64; as a side router or for the local machine only, without LuCI or dnsmasq routing, see the Debian / Ubuntu section under [Installation](#installation)
+- **Docker side router** (Linux Docker Engine): x86_64, aarch64; the container gets its own LAN IP through macvlan / ipvlan L2, with one-command install, offline images and `docker run`; new installs default to port 3036 and upgrades keep the existing port, see the [Docker deployment guide](docker/README.md)
 
-客户端（Open-Box App，四个平台同一套界面和功能），见[客户端](#客户端)：
+Clients (Open-Box App, the same interface and features on all four platforms), see [Clients](#clients):
 
-- **Android 手机**：Android 12 及以上、64 位 ARM，见[Android 客户端](#android-客户端)
-- **macOS 电脑**：Apple 芯片（M1 及以后）、macOS 14 及以上，见[macOS 客户端](#macos-客户端)
-- **Windows 电脑**：Windows 10 / 11 64 位，见[Windows 客户端](#windows-客户端)
-- **Linux 电脑**：Ubuntu 22.04 / 24.04、Debian 12，64 位 x86，见[Linux 客户端](#linux-客户端)
+- **Android phones**: Android 12 or later, 64-bit ARM, see [Android client](#android-client)
+- **macOS computers**: Apple silicon (M1 or later), macOS 14 or later, see [macOS client](#macos-client)
+- **Windows computers**: Windows 10 / 11 64-bit, see [Windows client](#windows-client)
+- **Linux computers**: Ubuntu 22.04 / 24.04, Debian 12, 64-bit x86, see [Linux client](#linux-client)
 
-## 使用说明视频
+## Router side
 
-来自[安格视界 YouTube 频道](https://www.youtube.com/@Ange-Digital-Life/videos?hl=zh-CN)的操作演示，按发布先后。点链接会在当前页面打开，建议**右键「在新标签页中打开」**（或按住 Ctrl / ⌘ 再点）：
+Open-Box installed on a router / host: a panel in the browser plus the sing-box core, routing traffic for the devices on the LAN.
 
-1. [最新软路由代理 Open-Box 发布！全图形极简配置，超越 OpenClash/Nikki/Passwall + SubStore + Zashboard？](https://youtu.be/G_7AmjfSRQ8)
-2. [集成 ADGuard Home + 故障转移 + 解决 Google Play 无法下载，Open-Box 更新了啥？](https://youtu.be/fczlXs2t5tI)
-3. [魔改 Sing-Box 1.14 内核，直连提速 200%！等同 Dae 性能，绝无 DNS 泄露 + 链式代理，Open-Box 完整体来了！](https://youtu.be/5_Z9d2zyzAw)
-4. [Open-Box 客户端 Android 来啦！真一键配置 + 完美分流，绝无DNS泄露，是时候卸载 Karing/ClashMi 等其他代理 App 了](https://youtu.be/NVUssX8ILxE)
-5. [Windows/macOS 来了，Open-Box 客户端，真一键配置 + 完美分流，绝无DNS泄露，生产力平台哪能缺席？](https://youtu.be/A1yFmwQLES4)
-6. [Open-Box 客户端 Liunx 版上线，支持 Ubuntu/Debian，真一键配置，Android 端解决Google Play 下载问题/Geimini无网络问题，iOS 更新预告！](https://youtu.be/DfNwBbd3ECQ)
+### Interface
 
-## 路由器端
+**Overview**: latency and recent trend for the four test sites, real-time charts of connections / memory / traffic, domain filtering stats and monthly traffic insights, all on one page.
 
-装在路由器 / 主机上的 Open-Box：浏览器里的面板加 sing-box 内核，给局域网里的设备分流。
+![Panel overview](docs/pic/overview.webp)
 
-### 界面
+**Proxies → Policy group**: one card per site set, showing the current route and node health at a glance.
 
-**概览**：四个测试站点的延时和最近几次的走势、连接 / 内存 / 流量的实时曲线、域名过滤统计和按月的流量洞察都在一页上。
+![Proxies page, Policy group tab](docs/pic/proxies-policies.webp)
 
-![面板概览](docs/pic/overview.webp)
+**Domain Drill**: expand a policy to see the full chain of site set, node group and the actual node.
 
-**代理 · 策略**：每个站点集一张卡片，直接看到当前线路和节点健康状态。
+![Domain Drill](docs/pic/proxies-penetration.webp)
 
-![代理页策略页签](docs/pic/proxies-policies.webp)
+**Rules → Actual route**: enter a domain to preview the rule match, and make a real request to see the route, DNS and the rule that matched.
+"LAN client" temporarily attaches a virtual interface with its own MAC to the LAN bridge, so it enters the router through the ingress the way a real device would. On virtualization platforms such as ESXi, set the port group's security policy "Promiscuous mode" to Accept, otherwise the virtual client cannot be created (the panel tells you; it does not silently fall back to core diagnostics).
 
-**域名穿透**：展开策略后，可以看到站点集、节点组和具体节点的完整链路。
+![Rule debugging](docs/pic/rules-route-test.webp)
 
-![域名穿透](docs/pic/proxies-penetration.webp)
+**Subscriptions**: supports Clash YAML, base64 share links and common sing-box share links; the subscription sharing area can be expanded or collapsed, and share links support QR codes, copying and enabling/disabling.
 
-**规则 · 真实路由**：输入域名后可预览规则匹配结果，并实际发起请求查看线路、DNS 和命中规则。
-「模拟终端」会在 LAN 网桥上临时挂一个带独立 MAC 的虚拟网口,像一台真实设备那样从入口进入路由器。ESXi 等虚拟化平台要把端口组安全策略的「混杂模式」设为接受,否则虚拟终端建不起来(面板会提示,不会悄悄退回内核诊断)。
+![Subscriptions](docs/pic/settings-subscriptions.webp)
 
-![规则调试](docs/pic/rules-route-test.webp)
+**Outbound nodes**: auto-select groups and manual-select groups can be mixed, and dynamic groups automatically pick up new nodes by keyword.
 
-**订阅管理**：支持 Clash YAML、base64 分享链接和常见 sing-box 分享链接；订阅分享区域可展开或收起，分享链接支持二维码、复制和启停。
+![Outbound nodes](docs/pic/settings-groups.webp)
 
-![订阅管理](docs/pic/settings-subscriptions.webp)
+**Destination routing**: site sets support matching by domain, domain suffix, keyword, IP range, rule set and rule set link. Site sets are matched top-down, and the first match wins. **IP conditions only handle IPs, and domain conditions only handle domains**, for both the pre-route rule and site sets: a request with a domain is matched by domain conditions only; if none match, it goes to the fallback "Other" and uses Other's exit, and the resolved IP is never checked against any IP range or geoip. IP conditions only apply to connections made directly to an IP for which the core cannot identify a domain. This keeps DNS and the connection on the same side: domains that fall back to direct are resolved with the direct DNS and also connect directly; to send a site through a node, add its domain to the relevant site set or to the pre-route rule. The built-in private network direct rule and "Direct for subscription & node hosts" are not part of routing and apply to every connection.
 
-**出站节点**：自动择优组和手动选择组可以混排，动态组会按关键词自动收编新节点。
+![Destination routing](docs/pic/settings-policies.webp)
 
-![出站节点](docs/pic/settings-groups.webp)
+**Chain proxy**: assign an upstream node or node group to exits such as residential / static IPs; while editing you can run a speed test and see the exit IP and its location.
 
-**目标分流**：站点集支持域名、域名后缀、关键词、IP 段、规则集和规则集链接等匹配方式。站点集从上往下匹配，先命中的算数。**IP 只管 IP，域名只管域名**，前置自定义分流和站点集都一样：有域名的访问只看域名条件，一个都没命中就走兜底「其他」，按「其他」的出口走，不会再拿解析出来的 IP 去对任何 IP 段、geoip；IP 条件只管直接按 IP 发起、内核也认不出域名的连接。这样 DNS 和连接永远走同一边：兜底直连的域名问直连 DNS、连接也直连；想让某个站点走节点，把它的域名加进对应站点集或前置自定义分流。内置的私网直连、订阅和节点站点直连不算分流，对所有连接生效。
+![Chain proxy](docs/pic/settings-chain-proxy.webp)
 
-![目标分流](docs/pic/settings-policies.webp)
+**Backend**: IPv6, test URLs, the core service and unified component upgrades are all managed here. Automatic speed tests honor each policy's configured test interval; within the interval the same node reuses its existing result, and on timeout it retries immediately or switches according to the policy.
 
-**链式代理**：住宅 / 静态 IP 这类出口指定一个前置节点或节点组，编辑时就能测速、看出口 IP 和归属。
+![Backend](docs/pic/settings-backend.webp)
 
-![链式代理](docs/pic/settings-chain-proxy.webp)
-
-**后端设置**：IPv6、测速地址、内核服务和统一组件升级都在这里管理。自动测速会遵守每个策略配置的检测间隔；同一节点在间隔内复用已有结果，超时按策略立即重试或切换。
-
-![后端设置](docs/pic/settings-backend.webp)
-
-**手机上打开面板**：同一个面板，窄屏自动改成单列 / 两列布局，底部导航（手机上的 App 见[客户端](#客户端)）。
+**Opening the panel on a phone**: the same panel; on narrow screens it switches to a one- or two-column layout with bottom navigation (for the phone app, see [Clients](#clients)).
 
 <p>
-  <img src="docs/pic/mobile-overview.webp" alt="手机端概览" width="45%">
-  <img src="docs/pic/mobile-proxies.webp" alt="手机端代理" width="45%">
+  <img src="docs/pic/mobile-overview.webp" alt="Mobile overview" width="45%">
+  <img src="docs/pic/mobile-proxies.webp" alt="Mobile proxies" width="45%">
 </p>
 
-### 主要功能
+### Main features
 
-- **客户端配置独立保存**：选择哪份配置，就使用那份配置所属路由器同步的测试站点、测速地址、超时和延时颜色阈值；节点组沿用各自的检测间隔、容差和成功状态码。语言、主题、指定 Wi-Fi 暂停 VPN、按 App 分流等本机偏好也分别保存，切换配置不会借用另一份配置的设置。升级自动迁移原有偏好。
-- **客户端直连 DNS**：在「设置 → 客户端」选择直连 DNS 使用当前网络（默认），或随配置使用路由器设置的直连 DNS；同步后生效。已同步配置和内容过滤快照可继续离线使用。
-- **内容过滤规则管理**：在「设置 → 客户端 → 内容过滤」管理规则、脚本快照和启停状态，内置「综合省流」「Youtube-Surge」「Youtube-补丁」三份默认快照。规则随配置同步到支持内容过滤的 iOS 客户端，由手机执行；离线可用，更新失败保留旧快照。升级保留已有规则及用户的编辑、停用和删除状态，备份恢复也包含规则与脚本。手机端仍需自行开启内容过滤并完成证书信任。
-- **订阅与节点**：支持 Clash 配置、base64 节点分享和 shadowsocks、vmess、vless（含 REALITY）、trojan、hysteria2（含端口跳跃）、tuic、anytls、wireguard 等协议。节点命名遵循 Open-Box 的重命名规则：有重命名时使用重命名，没有重命名时保留原名称。
-- **节点组**：提供自动择优（url-test）、手动选择（select）和故障转移组；动态组按关键词跟随订阅更新（链式代理不进动态组，要用就加进静态组），静态组可以手工选择节点。故障转移组按主备页签排优先级：主用不通才切到备用，主用恢复再切回。 自动择优、失败复查与故障转移的检测结果按节点、测速网址及成功状态码分别记录；失败后保留 10 秒复查，避免不同检测目标互相影响。
-- **链式代理**：给住宅 / 静态 IP 这类出口（socks5 / http / https，可粘链接或分字段填写）指定一个前置节点或节点组，流量先经前置再到出口；建好后作为普通节点用在节点组、站点集和终端分流里。
-- **目标分流**：规则可以直接填写，也可以添加规则集链接。规则集链接和本地规则明细可以同时保留、同时生效，不会因为导入明细而删除原有链接。规则集链接每 24 小时随内核启动更新一次，链接旁的「立即更新」可以马上重拉，内核自动加载新内容。
-- **切换不重启内核**：站点集在直连和代理之间切换时只改写一份很小的「开关规则集」，内核不重启——已建立的连接不断（下载、视频、SSH 不受影响），新连接和 DNS 在 1 秒内按新线路走。只有设备没有 nftables 重定向（纯 tun）、切换又牵动入口旁路，或者分流设置改过还没重启内核时，才会自动重新部署并重启一次。
-- **TUN 参数**：后端设置里可改 tun 的协议栈（mixed / gvisor / system）、MTU 和内核自己发出的 TCP 连接的 MSS 钳制。MT6000 这类开着硬件流量卸载的机器有线口直连大文件损坏时，协议栈选 gvisor。
-- **屏蔽 QUIC**：后端设置里的开关（默认开）。走代理线路的 QUIC（UDP 443）被拒绝，浏览器自动退回 TCP；直连的站点不受影响。不少节点转发 UDP 很差，YouTube 等走 QUIC 反而卡，所以默认开着；节点 UDP 很好的可以关掉。
-- **规则集导入**：在站点集编辑窗口点击“导入规则”，输入规则列表地址后可以先预览解析结果，再把域名、域名后缀、关键词、IP/CIDR 等明细导入站点集。导入后的明细保存在本地，启动时不再依赖该远程规则链接。
-- **订阅分享**：可以选择要分享的节点，设置标题和域名/IP，协议前缀支持 HTTP 或 HTTPS；保存一次即可生成并关闭窗口。分享列表支持展开/收起，单条分享可以启用或停用，也可以复制链接、刷新和删除。
-- **DNS 接管**：支持接管 dnsmasq 转发、防火墙劫持和禁用三种模式，国内域名与代理域名可以分别解析。DNS 页先选路由器在「中国大陆」还是「中国大陆之外」（香港、澳门、台湾都属于「中国大陆之外」；新装、升级和点「恢复默认」时按出口公网 IP 自动判断，也可以手动切换），两侧上游可改地址和协议（UDP / TCP），也可以选「上游 DNS」（路由器接口上 DHCP 分配或手动指定的 DNS）：「直连 DNS」给直连域名用，默认是上游 DNS；「代理 DNS」给走代理的域名用，在中国大陆默认 TCP 1.1.1.1、不能用上游 DNS（中国大陆的 DNS 对境外域名有污染），在中国大陆之外默认上游 DNS。代理 DNS 走哪条线路由目标分流按它的地址决定，和局域网设备访问这个地址一样（比如 1.1.1.1 落在「国外」里，就走「国外」此刻选的线路）；上游 DNS 固定直连。哪个域名用哪个上游由站点集此刻的出口决定，不用单独配置；要把某个域名固定成某个 IP 或另一个域名，用「DNS 重写」。开着域名过滤时，「域名解析查询」逐条列出查询和发起的终端设备（IP 加名称）；dnsmasq 模式下终端从 dnsmasq 的查询日志里认（日志写在内存里、面板边读边清，不进 logread），dnsmasq 用缓存直接答掉的查询也会记下来。
-- **入口旁路**：后端设置里的「直连不进内核」开关（默认开）管着整套；关掉后所有流量进内核，连接页和流量统计才能看到直连流量，代价是直连也要过一遍内核转发。开着时两种模式自动选，不用配置。**默认放行**（FakeIP 开着、兜底走直连时）：走代理的域名拿到的是占位地址、一定进内核，其余目标只要解析到的地址不在「进内核」名单（走代理 / 拒绝的站点集的 IP 集合）里，就在系统入口（nftables）直接放行——兜底直连、按域名直连的目标都不再经过内核。**默认进内核**（其余情况）：只有此刻走直连的站点集里的 IP 集合（默认「国内」的 geoip-cn 等）在入口放行，和走代理的集合有重叠的段会扣掉再放。两种模式之间、直连 / 代理翻面，都只改写几份规则集文件，内核不重启。此刻是哪种模式、为什么，规则页「业务入口」那一步写着。**直连应答放行**（默认放行模式下）：入口只看得到 IP，挂在 Cloudflare 这类 CDN 上的直连站（比如测速站、走兜底直连的网站）的地址落在走代理的集合里，入口分不出域名。内核在把直连站点集和兜底直连的 DNS 应答交给终端之前，先把其中会被送进内核的地址写进一个带超时的入口放行集合，终端拿到地址时连接已经在入口直接放走，第一条连接也不进内核。放行的地址按 DNS 应答的缓存时间保留（至少 15 分钟、最多一天）；重启内核时存下来，起来后按剩余时间写回去。把站点集从直连切到代理 / 拒绝、或者改过分流设置时整个清空重来（连同 dnsmasq 的缓存），从代理切回直连时只删掉不再需要放行的地址。在「连接」页关掉一条连接、或者重启内核，会顺带清掉系统里这条连接的跟踪记录，卡在内核里的 UDP 长连接会按当前规则重新判定。**直连终端**：终端分流里给某台终端选了「直连」时，它的新连接的第一个包由内核按规则预判，不命中前置自定义分流里走代理 / 拒绝的 IP 段、规则集、端口，就在入口放行、整条连接不进内核（本来就不进内核的连接不预判，多宽带选线不受影响）；它的 DNS 查询也交给内核按这台终端答，拿到的是直连解析的真实地址，dnsmasq 模式下同样如此。选了「不进内核」的终端也按终端答 DNS，万一拿到 FakeIP 占位地址，连接照常进内核，不会连不上。「订阅和节点站点直连」里的节点服务器地址同样按首包预判在入口放行，局域网设备直连节点服务器不经过内核。默认放行模式的边界：把一个站点集从直连切到代理后，终端本地 DNS 缓存里还没过期的真实 IP 仍会按直连走；终端自带 DoH、开 FakeIP 之前缓存的真实 IP 同样不在保证内。
-- **共享网络**：可以把内核入站开放给局域网中的其它设备作为代理使用。
-- **Tailscale 组网**：在「设置 → 组网」把路由器加入 Tailscale 网络（官方控制服务器），共享本地局域网网段、填上其他地点共享出来的网段，各地设备不用装任何东西就能按局域网 IP 互相访问。登录密钥在 Tailscale 后台生成，共享的网段要在后台批准后才生效；各地的网段不能重叠。登录密钥不进导出文件，也不会同步到客户端。改动在重启内核后生效。
-- **导出与导入**：把分流、站点集、节点组、DNS、面板设置打成一个文件，可选带上订阅和节点、链式代理、终端分流、共享网络；新设备导入后重启内核即可。文件不含面板密码。
-- **流量统计**：按终端设备、节点和访问目标查看每日流量。
-- **内容过滤规则恢复**：在「客户端 → 内容过滤」点击“恢复默认”，可离线恢复三份内置规则；保留用户自己添加的规则，恢复后在手机端同步。
-- **内置规则数据库**：完整安装包自带 GeoSite / GeoIP 数据，首次安装和启动无需单独下载规则数据库。 v0.1.335 已同步 2026-10-16 的数据（1,917 份 GeoSite、260 份 GeoIP），支持按简体中文、繁体中文和英文说明搜索。
-- **组件升级**：Open-Box 程序、sing-box 内核和 GeoSite / GeoIP 数据统一从本仓库 Release 获取。升级前会校验本地版本和文件完整性，版本一致且文件正常时不会重复下载；完整安装包始终包含三类组件，新安装无需另行下载规则数据库。
-- **LuCI 兜底页**：面板打不开时，可以从路由器的“服务 → Open-Box”页面启停服务、恢复直连或卸载。
+- **Per-profile client settings**: whichever profile you select, the app uses the test sites, test URL, timeout and latency color thresholds synced from that profile's router; node groups keep their own test interval, tolerance and success status codes. Local preferences such as language, theme, Pause VPN on trusted Wi-Fi and per-app routing are also saved separately, so switching profiles never borrows another profile's settings. Upgrades migrate existing preferences automatically.
+- **Client direct DNS**: under "Settings → App", choose whether direct DNS uses the current network (default) or the router's direct DNS that comes with the profile; it takes effect after syncing. Synced profiles and content filtering snapshots keep working offline.
+- **Content filtering rule management**: manage rules, script snapshots and their enabled state under "Settings → App → Content filtering"; three default snapshots are built in: "Combined Data Saver", "Youtube-Surge" and "Youtube-Patch". Rules sync with the profile to iOS clients that support content filtering and are enforced on the phone; they work offline, and a failed update keeps the old snapshot. Upgrades keep existing rules and the user's edits, disabled and deleted states, and backup and restore also include rules and scripts. On the phone you still need to turn on content filtering yourself and trust the certificate.
+- **Subscriptions and nodes**: supports Clash configs, base64 node shares and protocols including shadowsocks, vmess, vless (including REALITY), trojan, hysteria2 (including port hopping), tuic, anytls and wireguard. Node naming follows Open-Box's renaming rule: a renamed node uses its new name, otherwise the original name is kept.
+- **Node groups**: provides auto-select (url-test), manual select (select) and failover groups; dynamic groups follow subscription updates by keyword (chain proxies are not added to dynamic groups; to use one, add it to a static group), and static groups let you pick nodes by hand. Failover groups rank priority with primary and backup tabs: traffic switches to the backup only when the primary is down, and switches back when the primary recovers. Test results for auto-select, failure rechecks and failover are recorded separately per node, test URL and success status code; after a failure the result is kept for a 10-second recheck, so different test targets do not affect each other.
+- **Chain proxy**: assign an upstream node or node group to an exit such as a residential / static IP (socks5 / http / https; paste a link or fill in the fields), so traffic goes through the upstream first and then to the exit; once created, it works as a normal node in node groups, site sets and Client routing.
+- **Destination routing**: rules can be entered directly or added as rule set links. Rule set links and local rule entries can be kept and active at the same time; importing entries does not delete the original link. Rule set links are updated every 24 hours when the core starts; "Update now" next to a link refetches it immediately, and the core loads the new content automatically.
+- **Switching without restarting the core**: when a site set switches between direct and proxy, only a tiny "switch rule set" is rewritten and the core does not restart: established connections stay up (downloads, video and SSH are unaffected), and new connections and DNS follow the new route within 1 second. A redeploy and one core restart happen automatically only when the device has no nftables redirect (pure tun), when the switch also affects the entry bypass, or when routing settings have changed but the core has not been restarted yet.
+- **TUN parameters**: in Backend you can change the tun stack (mixed / gvisor / system), the MTU, and the MSS clamp for TCP connections made by the core itself. On devices with hardware flow offloading enabled, such as the MT6000, choose gvisor as the stack if large files get corrupted over a direct wired connection.
+- **Block QUIC**: a switch in Backend (on by default). QUIC (UDP 443) on proxy routes is rejected and browsers fall back to TCP automatically; direct sites are unaffected. Many nodes forward UDP poorly, and sites such as YouTube actually stutter over QUIC, so it is on by default; turn it off if your nodes handle UDP well.
+- **Rule set import**: in the site set edit window, click "Import rules", enter a rule list URL, preview the parsed result, then import entries such as domains, domain suffixes, keywords and IP/CIDR into the site set. Imported entries are stored locally, so startup no longer depends on that remote rule link.
+- **Subscription sharing**: choose the nodes to share, set a title and domain/IP, and use HTTP or HTTPS as the protocol prefix; save once to generate the link and close the window. The share list can be expanded/collapsed, and each share can be enabled or disabled, copied, refreshed and deleted.
+- **DNS takeover**: three modes are supported: dnsmasq forwarding, firewall hijack and off; domestic domains and proxied domains can be resolved separately. On the DNS page, first choose whether the router is in "Mainland China" or "Outside mainland China" (Hong Kong, Macau and Taiwan count as "Outside mainland China"; on a new install, an upgrade, or clicking "Restore defaults", this is detected automatically from the egress public IP, and you can also switch it manually). Upstreams on both sides can have their address and protocol (UDP / TCP) changed, or you can choose "Upstream DNS" (the DNS assigned by DHCP or set manually on the router's interface): "Direct DNS" is for direct domains and defaults to Upstream DNS; "Proxy DNS" is for proxied domains: in mainland China it defaults to TCP 1.1.1.1 and cannot use Upstream DNS (DNS in mainland China poisons answers for foreign domains), and outside mainland China it defaults to Upstream DNS. Which route Proxy DNS takes is decided by Destination routing based on its address, the same as when a LAN device accesses that address (for example, 1.1.1.1 falls under "Overseas", so it uses whatever route "Overseas" has selected at the moment); Upstream DNS always goes direct. Which upstream a domain uses is determined by the current exit of its site set, with no separate configuration; to pin a domain to an IP or to another domain, use "DNS rewrites". With domain filtering on, "Domain resolution queries" lists each query and the device that made it (IP plus name); in dnsmasq mode, devices are identified from dnsmasq's query log (the log is written to memory and the panel clears it as it reads, so it does not go into logread), and queries dnsmasq answers from its cache are recorded too.
+- **Entry bypass**: the "Direct traffic bypasses the core" switch in Backend (on by default) controls the whole thing; when it is off, all traffic enters the core, so direct traffic shows up on the Connections page and in traffic stats, at the cost of direct traffic also being forwarded through the core. When it is on, one of two modes is chosen automatically, with nothing to configure. **Default bypass** (when FakeIP is on and the fallback goes direct): proxied domains get placeholder addresses and always enter the core; any other destination whose resolved address is not on the "enter core" list (the IP sets of site sets that go through a proxy or are rejected) is let through directly at the system entry (nftables), so destinations that fall back to direct or go direct by domain no longer pass through the core. **Default into core** (all other cases): only the IP sets of site sets currently going direct (by default geoip-cn and others in "Domestic") are let through at the entry, and ranges that overlap with proxied sets are subtracted before being let through. Switching between the two modes, and flipping between direct and proxy, only rewrites a few rule set files; the core does not restart. Which mode is active and why is shown in the "Entry" step on the Rules page. **Direct answer bypass** (in default bypass mode): the entry only sees IPs, and direct sites hosted on CDNs such as Cloudflare (for example speed-test sites, or sites that fall back to direct) have addresses that fall inside proxied sets, so the entry cannot tell the domain apart. Before passing DNS answers for direct site sets and fallback-direct domains to the device, the core first writes any addresses that would be sent into the core into an entry bypass set with a timeout, so by the time the device gets the address the connection is already let through at the entry, and even the first connection does not enter the core. Bypassed addresses are kept for the DNS answer's cache time (at least 15 minutes, at most one day); they are saved when the core restarts and written back with the remaining time once it is up. When a site set switches from direct to proxy / reject, or routing settings change, the whole set is cleared and rebuilt (along with the dnsmasq cache); when switching from proxy back to direct, only the addresses that no longer need to bypass are removed. Closing a connection on the "Connections" page, or restarting the core, also clears the system's tracking entry for that connection, so long-lived UDP connections stuck in the core are re-evaluated under the current rules. **Direct clients**: when a device is set to "Direct" in Client routing, the first packet of each of its new connections is pre-checked by the core against the rules; if it does not hit the proxy / reject IP ranges, rule sets or ports in the pre-route rule, it is let through at the entry and the whole connection skips the core (connections that would not enter the core anyway are not pre-checked, and multi-WAN line selection is unaffected); its DNS queries are also handed to the core and answered for that device, so it gets the real addresses from direct resolution, in dnsmasq mode as well. Devices set to "Bypass kernel" also get per-device DNS answers; if one does get a FakeIP placeholder address, the connection enters the core as usual and still works. Node server addresses in "Direct for subscription & node hosts" are likewise pre-checked on the first packet and let through at the entry, so LAN devices connecting directly to node servers do not go through the core. Limits of default bypass mode: after a site set switches from direct to proxy, real IPs still unexpired in a device's local DNS cache will keep going direct; real IPs cached by devices using their own DoH, or cached before FakeIP was turned on, are likewise not covered.
+- **Share network**: opens the core's inbounds to other devices on the LAN for use as a proxy.
+- **Tailscale networking**: under "Settings → Tailscale", join the router to a Tailscale network (official control server), share the local LAN subnets and enter the subnets shared from other locations, so devices at every location can reach each other by LAN IP without installing anything. The auth key is generated in the Tailscale admin console, and shared subnets take effect only after they are approved there; subnets at different locations must not overlap. The auth key is not included in export files and is not synced to clients. Changes take effect after restarting the core.
+- **Export & import**: packs routing, site sets, node groups, DNS and panel settings into one file, optionally including subscriptions and nodes, chain proxies, Client routing and Share network; import it on a new device and restart the core. The file does not include the panel password.
+- **Traffic stats**: view daily traffic by device, node and destination.
+- **Content filtering rule restore**: under "App → Content filtering", click "Restore defaults" to restore the three built-in rule sets offline; rules you added yourself are kept, and after restoring, sync on the phone.
+- **Built-in rule database**: the full package ships with GeoSite / GeoIP data, so no separate rule database download is needed on first install or startup. v0.1.335 includes the data as of 2026-10-16 (1,917 GeoSite and 260 GeoIP lists), searchable by Simplified Chinese, Traditional Chinese and English descriptions.
+- **Component upgrades**: the Open-Box program, the sing-box core and the GeoSite / GeoIP data are all fetched from this repository's Releases. Before upgrading, local versions and file integrity are checked; if the version matches and the files are intact, nothing is downloaded again. The full package always includes all three components, so new installs do not need to download the rule database separately.
+- **LuCI fallback page**: when the panel will not open, you can start/stop the service, restore direct connection or uninstall from the router's "Services → Open-Box" page.
 
-### 下载
+### Download
 
-请从 [GitHub Releases](https://github.com/wan-family-office/open-box-releases/releases/latest) 下载对应架构的完整安装包：
+Download the full package for your architecture from [GitHub Releases](https://github.com/wan-family-office/open-box-releases/releases/latest):
 
-- `x64`：x86_64 路由器 / 主机
-- `arm64`：aarch64 路由器 / 主机
+- `x64`: x86_64 routers / hosts
+- `arm64`: aarch64 routers / hosts
 
-客户端的安装包见[客户端](#客户端)。
+For client packages, see [Clients](#clients).
 
-同一份安装包既能装在 OpenWrt 上，也能装在 Debian / Ubuntu（systemd）上，安装脚本会自行识别（见[安装](#安装)末尾）。
+The same package installs on both OpenWrt and Debian / Ubuntu (systemd); the install script detects which one it is on (see the end of [Installation](#installation)).
 
-完整安装包包含 Open-Box、sing-box、Node 运行时和全部 GeoSite / GeoIP 数据。每个资产旁边都有 SHA256 校验文件。
+The full package contains Open-Box, sing-box, the Node runtime and all GeoSite / GeoIP data. Every asset has a SHA256 checksum file next to it.
 
-作为旁路由使用（把终端的网关 / DNS 指向 Open-Box 所在设备）时，旁路由的 LAN 区域要打开「IP 动态伪装」（MASQUERADE），否则直连站点的回包不经旁路由、连接对不上，表现为只能上国外、打不开大陆网站。
+When used as a side router (devices point their gateway / DNS at the machine running Open-Box), turn on "IP masquerading" (MASQUERADE) for the side router's LAN zone; otherwise replies from direct sites do not pass back through the side router and connections do not match up, which shows up as foreign sites working while mainland China sites will not open.
 
-### 安装
+### Installation
 
-SSH 以 root 登录 OpenWrt 路由器后执行：
+Log in to the OpenWrt router over SSH as root and run:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/wan-family-office/open-box-releases/main/scripts/install.sh | sh
 ```
 
-GitHub 访问不畅时，需要先通过可访问的 raw 镜像获取安装脚本，再让脚本使用镜像下载发布包：
+If GitHub is hard to reach, first get the install script through a reachable raw mirror, then have the script use the mirror to download the release package:
 
 ```sh
 curl -fsSL https://gh-proxy.com/raw.githubusercontent.com/wan-family-office/open-box-releases/main/scripts/install.sh | sh -s -- --mirror
 ```
 
-`--mirror` 只控制安装包下载；如果最外层的 `raw.githubusercontent.com` 本身无法访问，直接在原地址后追加 `--mirror` 仍然无法取得脚本。
+`--mirror` only controls the package download; if the outer `raw.githubusercontent.com` itself is unreachable, appending `--mirror` to the original URL still cannot fetch the script.
 
-安装过程中会问一次面板端口（默认 **3036**，直接回车即可）。端口会先检查是否可用——被别的程序占用、或与 Open-Box 自己和系统的端口冲突时，会说明原因并让你重填。也可以用 `--port` 直接指定，例如在上面的命令末尾加 ` --port 3080`。装完之后还能改，见[修改面板端口](#修改面板端口)。
+During installation you are asked once for the panel port (default **3036**; just press Enter). The port is checked first: if another program is using it, or it conflicts with Open-Box's own or the system's ports, the reason is shown and you are asked to enter another. You can also set it directly with `--port`, for example by appending ` --port 3080` to the command above. You can still change it after installation, see [Change the panel port](#change-the-panel-port).
 
-安装要求：OpenWrt（iStoreOS 22.03、OpenWrt 22.03 及更早的固件太老装不了，请先升级到 iStoreOS 24 / OpenWrt 24 以上）、x86_64 或 aarch64、至少 512MB 存储空间和 512MB 内存。安装 / 升级脚本会检查并尝试用 opkg 或 apk 补齐系统依赖（kmod-tun、kmod-nft-queue、kmod-nft-nat、kmod-veth、ip-full、ca-bundle）；软件源不通时只提示、不中断，可稍后按提示手动安装，设 `OPENBOX_SKIP_DEPS=1` 可跳过这一步。安装完成后，用浏览器打开脚本提示的 `http://<路由器局域网 IP>:<面板端口>` 地址，首次访问设置管理密码。
+Requirements: OpenWrt (iStoreOS 22.03, OpenWrt 22.03 and older firmware are too old to install on; upgrade to iStoreOS 24 / OpenWrt 24 or later first), x86_64 or aarch64, at least 512MB of storage and 512MB of RAM. The install / upgrade scripts check for and try to fill in system dependencies with opkg or apk (kmod-tun, kmod-nft-queue, kmod-nft-nat, kmod-veth, ip-full, ca-bundle); if the package feeds are unreachable they only warn and do not abort, so you can install them manually later as prompted; set `OPENBOX_SKIP_DEPS=1` to skip this step. After installation, open the `http://<router LAN IP>:<panel port>` address printed by the script in a browser and set an admin password on first visit.
 
-安装完成后，用浏览器打开 `http://<路由器 LAN 地址>:<面板端口>`（安装脚本结束时会打印这个地址），**首次打开时设置面板密码**。以后忘了密码不用重装，见下面的[忘记面板密码](#忘记面板密码)。
+After installation, open `http://<router LAN address>:<panel port>` in a browser (the install script prints this address at the end), and **set the panel password on first visit**. If you forget the password later, there is no need to reinstall, see [Forgot the panel password](#forgot-the-panel-password) below.
 
 #### Debian / Ubuntu
 
-同样的安装、升级、卸载命令也适用于 Debian / Ubuntu（需要 systemd；在 Ubuntu 24.04 上验证过），以 root 或 `sudo` 执行即可。脚本会识别系统：服务交给 systemd（`openbox.service` 内核、`openbox-panel.service` 面板），命令行 `open-box` 放在 `/usr/local/bin`，随包的 Node 是 OpenWrt 用的 musl 版，安装时会从 nodejs.org（不通时换 npmmirror）下载同版本的官方 glibc 版替换，所以安装机器要能访问其中之一。依赖用 apt 补齐（nftables、xz-utils、iproute2、ca-certificates），tun / nftables 内核模块随发行版内核自带。
+The same install, upgrade and uninstall commands also work on Debian / Ubuntu (requires systemd; verified on Ubuntu 24.04); run them as root or with `sudo`. The script detects the system: services are handed to systemd (`openbox.service` for the core, `openbox-panel.service` for the panel), the `open-box` command goes in `/usr/local/bin`, and since the bundled Node is the musl build used on OpenWrt, installation downloads the official glibc build of the same version from nodejs.org (or npmmirror if that is unreachable) to replace it, so the machine needs access to one of them. Dependencies are filled in with apt (nftables, xz-utils, iproute2, ca-certificates); the tun / nftables kernel modules come with the distribution kernel.
 
-和 OpenWrt 的差别：
+Differences from OpenWrt:
 
-- 没有 LuCI 页面，也没有 dnsmasq 分流模式——DNS 只有「防火墙劫持」和「关闭」两种；本机用 systemd-resolved 的话它的上游查询同样会被内核接管，不需要改 resolved 的配置。
-- 防火墙由你自己管理：脚本不会写任何放行规则。装了 ufw / firewalld 之类的话，要自己放行面板端口，以及（作为旁路由时）局域网到本机的转发。
-- 内核启动时会打开 IP 转发（`net.ipv4.ip_forward=1`，原来关着的话停止时关回去），这样局域网终端把网关 / DNS 指向这台机器就能走它分流；只给本机用的话不用管。
-- 排障看 `journalctl -u openbox -u openbox-panel`；紧急恢复直连 `systemctl stop openbox`。
+- No LuCI page and no dnsmasq routing mode: DNS has only "Firewall hijack" and "Off". If the local machine uses systemd-resolved, its upstream queries are taken over by the core as well, with no need to change resolved's configuration.
+- You manage the firewall yourself: the script writes no allow rules. If you have ufw / firewalld or similar installed, allow the panel port yourself, and (as a side router) forwarding from the LAN to this machine.
+- The core turns on IP forwarding when it starts (`net.ipv4.ip_forward=1`; if it was off before, it is turned back off when the core stops), so LAN devices that point their gateway / DNS at this machine get routed through it; if it is for the local machine only, you can ignore this.
+- For troubleshooting, see `journalctl -u openbox -u openbox-panel`; to restore direct connection in an emergency, run `systemctl stop openbox`.
 
-### 修改面板端口
+### Change the panel port
 
-新装的默认端口是 **3036**；**v0.1.216 及更早装的机器升级后端口不变**（还是 2026），不会被新默认值挪走。
+New installs default to port **3036**; **machines installed with v0.1.216 or earlier keep their port after upgrading** (still 2026) and are not moved to the new default.
 
-两种改法，效果一样：
+Two ways, same result:
 
-- **LuCI 页面**：路由器管理界面 → 服务 → Open-Box，「Open-Box 面板」那张卡片的按钮排末尾点「修改端口」。填新端口保存即可；有冲突不会保存并告诉你原因，面板正在运行的话会自动重启一次。
-- **SSH**：`open-box port` 看当前端口，`open-box port 3080` 改成 3080。
+- **LuCI page**: router admin interface → Services → Open-Box; on the "Open-Box panel" card, click "Change port" at the end of the button row. Enter the new port and save; if there is a conflict it is not saved and you are told why, and if the panel is running it restarts once automatically.
+- **SSH**: `open-box port` shows the current port, and `open-box port 3080` changes it to 3080.
 
-改完记得用新地址访问面板。
+Afterward, remember to open the panel at the new address.
 
-### 忘记面板密码
+### Forgot the panel password
 
-面板密码保存在路由器上，能以 root 登上路由器就能查到，**不需要重装，也不会丢失订阅和规则**。两个地方可以看：
+The panel password is stored on the router, so anyone who can log in to the router as root can look it up; **no reinstall is needed, and subscriptions and rules are not lost**. There are two places to see it:
 
-**1. LuCI 页面**：路由器管理界面 → 服务 → Open-Box，页面顶部「完整管理请到 Open-Box 面板：」那一行，面板地址后面直接显示 `密码: xxxx`。刚升级完看不到的话，退出 LuCI 重新登录一次。
+**1. LuCI page**: router admin interface → Services → Open-Box; in the "Full management lives in the Open-Box panel:" line at the top of the page, the password is shown as `Password: xxxx` right after the panel address. If you do not see it right after upgrading, log out of LuCI and log in again.
 
-**2. SSH 命令**：SSH 登上路由器后运行 `open-box`，选 `1`：
+**2. SSH command**: after logging in to the router over SSH, run `open-box` and choose `1`:
 
 ```text
 root@OpenWrt:~# open-box
@@ -190,142 +179,142 @@ Open-Box v0.1.216
   当前密码: ********
 ```
 
-只想要密码本身可以直接运行 `open-box password`；`open-box check` 检查有没有新版本，`open-box update` 直接升级，`open-box restart` 重启内核和面板，`open-box uninstall` 卸载。
+If you only want the password itself, run `open-box password` directly; `open-box check` checks for a new version, `open-box update` upgrades directly, `open-box restart` restarts the core and the panel, and `open-box uninstall` uninstalls.
 
-以上两个入口从 **v0.1.210** 开始提供。更早的版本先通过 SSH 执行下面「升级」一节的命令升到最新版（升级会保留密码、订阅和规则），升级完成后 `open-box` 命令就可以用了。
+Both entry points are available from **v0.1.210**. On older versions, first upgrade to the latest version over SSH with the command in the "Upgrade" section below (upgrading keeps the password, subscriptions and rules); after that the `open-box` command is available.
 
-查到密码后想换一个：登录面板，在「设置」页点「修改密码」。
+To change the password after finding it: log in to the panel and click "Change password" on the "Settings" page.
 
-### 升级
+### Upgrade
 
-面板中可以从“设置 → 后端设置”检查更新，也可以通过 SSH 执行（OpenWrt 与 Debian / Ubuntu 同一条命令）：
+In the panel you can check for updates under "Settings → Backend", or run this over SSH (the same command for OpenWrt and Debian / Ubuntu):
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/wan-family-office/open-box-releases/main/scripts/update.sh | sh
 ```
 
-升级会保留订阅、规则和面板密码，并校验 Open-Box、sing-box、GeoSite / GeoIP 组件。相同且完整的组件直接复用，只有变化、缺失或损坏的组件才会从本仓库 Release 下载。
+Upgrading keeps subscriptions, rules and the panel password, and verifies the Open-Box, sing-box and GeoSite / GeoIP components. Identical, intact components are reused directly; only changed, missing or damaged components are downloaded from this repository's Releases.
 
-#### 回退到上一个版本
+#### Roll back to the previous version
 
-如果升级后面板或内核异常,可以用下面的命令回退:脚本会到 GitHub 查当前版本之前最近的正式 Release,重新下载那一版的完整安装包装回去。路由器本机不保留旧版备份,所以回退需要能访问 GitHub(或镜像);订阅、规则、面板密码等数据目录不会被动。
+If the panel or core misbehaves after an upgrade, you can roll back with the command below: the script looks up on GitHub the most recent stable Release before the current version and downloads and reinstalls that version's full package. The router does not keep a local backup of the old version, so rolling back requires access to GitHub (or a mirror); data directories such as subscriptions, rules and the panel password are left untouched.
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/wan-family-office/open-box-releases/main/scripts/update.sh | sh -s -- --rollback --direct
 ```
 
-GitHub 访问不畅时，使用代理执行：
+If GitHub is hard to reach, run it through a proxy:
 
 ```sh
 curl -fsSL https://gh-proxy.com/raw.githubusercontent.com/wan-family-office/open-box-releases/main/scripts/update.sh | sh -s -- --rollback --mirror https://gh-proxy.com
 ```
 
-两条命令都会自动识别路由器架构,下载上一个版本的完整安装包,先校验 SHA256,再替换当前文件;校验或替换失败会保留现有安装。--mirror 只影响安装包下载,查询 Release 列表的 GitHub API 会先直连、直连不通再经镜像。
+Both commands detect the router architecture automatically, download the previous version's full package, verify its SHA256 first, and then replace the current files; if verification or replacement fails, the existing installation is kept. --mirror only affects the package download; the GitHub API used to query the Release list is tried directly first and goes through the mirror only if the direct connection fails.
 
-### 卸载
+### Uninstall
 
-默认停止服务并保留订阅和配置数据：
+By default, this stops the service and keeps subscriptions and configuration data:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/wan-family-office/open-box-releases/main/scripts/uninstall.sh | sh
 ```
 
-连数据一起删除：
+To delete the data as well:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/wan-family-office/open-box-releases/main/scripts/uninstall.sh | sh -s -- --purge
 ```
 
-## 客户端
+## Clients
 
-Open-Box App 把家里路由器端的分流规则带到手机、电脑上：在外面也按同一套规则分流，App 里的内核和路由器端是同一个 sing-box。Android、macOS、Windows、Linux 四个平台同一套界面和功能：
+The Open-Box App brings the routing rules of your home router side to phones and computers: away from home, traffic is still routed by the same rules, and the core inside the App is the same sing-box as on the router side. Android, macOS, Windows and Linux share the same interface and features:
 
-- **节点分流**：在面板「设置 → 客户端」的「节点分流（客户端）」里扫共享网络服务器的码（电脑上粘贴链接）。App 按所在地区选一组规则（「地区分流」，可以自动定位），国内网站本地直连，其余经家里的路由器出去；路由器要有公网 IP。
-- **本地分流**：扫面板「本地分流（客户端）」的码（电脑上粘贴链接），或导入那里导出的文件。路由器的订阅节点、节点组、目标分流、链式代理整套导进 App，App 自己分流、不经过路由器；路由器上改了配置，在 App 里同步一下就跟上，订阅在 App 本机按计划刷新。
-- **和路由器一样的分流**：选了直连的流量不进内核；「连接」页能看每条连接走哪条线路、看内核日志，「路由」页签输入网址就能看它按哪条规则走（规则路由）、实际访问时怎么走（真实路由）。
-- **其他**：连上指定的 Wi-Fi（比如到家后）自动暂停 VPN、IPv6 开关、简体 / 繁體 / English、亮色 / 深色主题。
+- **Node routing**: in the panel under "Settings → App", scan the Share network server's code in "Node routing (app)" (paste the link on a computer). The App picks a set of rules based on your region ("Region routing", which can locate you automatically); domestic sites connect directly from where you are, and everything else goes out through your home router; the router needs a public IP.
+- **Local routing**: scan the code in the panel's "Local routing (app)" (paste the link on a computer), or import the file exported there. The router's subscription nodes, node groups, Destination routing and chain proxies are imported into the App as a whole, and the App does its own routing without going through the router; when you change the configuration on the router, sync in the App to catch up, and subscriptions refresh on schedule on the device itself.
+- **Same routing as the router**: traffic set to direct does not enter the core; the "Traffic" page shows which route each connection takes and the core logs, and on the "Route" tab you enter a URL to see which rule it matches (Rule route) and how it actually goes when accessed (Actual route).
+- **Other**: automatically pause the VPN on specified Wi-Fi (for example when you get home), an IPv6 switch, Simplified Chinese / Traditional Chinese / English, light / dark theme.
 
-安装包都在 [Releases](https://github.com/wan-family-office/open-box-releases/releases)：`open-box-android-<版本>.apk`、`open-box-macos-<版本>-arm64.dmg`、`open-box-windows-<版本>-x64-setup.exe`、`open-box-desktop-linux-<版本>-amd64.deb`，也可以在面板「设置 → 客户端」最上面的「客户端下载」里直接点。客户端只在有更新时随版本发布；最新版没带的话，它的版本说明末尾「客户端下载」一节有最新安装包的链接，也可以在 Releases 列表里往前找。
+The packages are all on [Releases](https://github.com/wan-family-office/open-box-releases/releases): `open-box-android-<version>.apk`, `open-box-macos-<version>-arm64.dmg`, `open-box-windows-<version>-x64-setup.exe`, `open-box-desktop-linux-<version>-amd64.deb`; you can also click them directly in "Client downloads" at the top of the panel's "Settings → App". Clients are released only when they have updates; if the latest release does not include them, the "Client downloads" section at the end of its release notes links to the latest packages, or you can look back through the Releases list.
 
-### Android 客户端
+### Android client
 
-- **系统要求**：Android 12 及以上、64 位 ARM。
-- **安装与升级**：从 [Releases](https://github.com/wan-family-office/open-box-releases/releases) 下载最新的 `open-box-android-<版本>.apk`（或在面板「设置 → 客户端」的「客户端下载」里点 Android 图标），第一次手动安装（系统会提示允许安装来自浏览器 / 文件管理器的应用）；以后在 App「设置 → 检查更新」里一键升级。
+- **Requirements**: Android 12 or later, 64-bit ARM.
+- **Install and upgrade**: download the latest `open-box-android-<version>.apk` from [Releases](https://github.com/wan-family-office/open-box-releases/releases) (or tap the Android icon in "Client downloads" under the panel's "Settings → App") and install it manually the first time (the system will ask you to allow installing apps from the browser / file manager); after that, upgrade with one tap under "Settings → Check for updates" in the App.
 
-首页（节点分流）、代理 · 策略（本地分流）、连接 · 路由、设置：
-
-<p>
-  <img src="docs/pic/app-home.webp" alt="App 首页" width="45%">
-  <img src="docs/pic/app-proxies.webp" alt="App 代理 · 策略" width="45%">
-</p>
-<p>
-  <img src="docs/pic/app-route.webp" alt="App 连接 · 路由" width="45%">
-  <img src="docs/pic/app-settings.webp" alt="App 设置" width="45%">
-</p>
-
-### macOS 客户端
-
-App 常驻菜单栏，退出 App 就断开 VPN；设置里有开机自启开关（默认关）。
-
-- **系统要求**：Apple 芯片（M1 及以后）的 Mac，macOS 14 及以上。
-- **安装**：从 [Releases](https://github.com/wan-family-office/open-box-releases/releases) 下载最新的 `open-box-macos-<版本>-arm64.dmg`（或在面板「设置 → 客户端」的「客户端下载」里点 macOS 图标），打开后把 Open-Box 拖进「应用程序」。App 没有 Apple 开发者签名，第一次打开会提示无法验证：到「系统设置 → 隐私与安全性」最下面点「仍要打开」（macOS 15 起右键「打开」已经绕不过去）。第一次打开还会请你输一次电脑密码，装一个后台服务（建立 VPN、修改系统 DNS 用，断开后自动还原）。
-- **升级**：在 App「设置 → 检查更新」里一键升级，不用再点「仍要打开」；后台服务有变化时会再请你输一次电脑密码。
-- **卸载**：App「设置 → 卸载 Open-Box」。
-- 「连接指定 Wi-Fi 暂停」要允许 App 使用位置信息（macOS 只把 Wi-Fi 名称给有定位权限的 App）。
-
-首页（节点分流）、代理 · 策略（本地分流）、连接 · 路由、设置：
+Home (Node routing), Proxies → Policies (Local routing), Traffic → Route, Settings:
 
 <p>
-  <img src="docs/pic/mac-home.webp" alt="macOS 首页" width="45%">
-  <img src="docs/pic/mac-proxies.webp" alt="macOS 代理 · 策略" width="45%">
+  <img src="docs/pic/app-home.webp" alt="App Home" width="45%">
+  <img src="docs/pic/app-proxies.webp" alt="App Proxies → Policies" width="45%">
 </p>
 <p>
-  <img src="docs/pic/mac-route.webp" alt="macOS 连接 · 路由" width="45%">
-  <img src="docs/pic/mac-settings.webp" alt="macOS 设置" width="45%">
+  <img src="docs/pic/app-route.webp" alt="App Traffic → Route" width="45%">
+  <img src="docs/pic/app-settings.webp" alt="App Settings" width="45%">
 </p>
 
-### Windows 客户端
+### macOS client
 
-App 常驻任务栏右下角：关掉窗口还在后台，左键点图标打开窗口，右键菜单里可以连接 / 断开、退出；退出 App 就断开 VPN。设置里有开机自启开关（默认关）。
+The App stays in the menu bar, and quitting it disconnects the VPN; Settings has a launch-at-login switch (off by default).
 
-- **系统要求**：Windows 10 / 11，64 位。
-- **安装**：从 [Releases](https://github.com/wan-family-office/open-box-releases/releases) 下载最新的 `open-box-windows-<版本>-x64-setup.exe`（或在面板「设置 → 客户端」的「客户端下载」里点 Windows 图标），双击安装。安装包没有代码签名，运行时会提示「Windows 已保护你的电脑」：点「更多信息 → 仍要运行」，再在用户账户控制里点「是」。安装时会装一个后台服务（建立 VPN 用）。
-- **升级**：在 App「设置 → 检查更新」里一键升级：用户账户控制里点一次「是」，装好后 App 自动重新打开。
-- **卸载**：App「设置 → 卸载 Open-Box」，或在 Windows「设置 → 应用 → 已安装的应用」里卸载 Open-Box。
-- 「连接指定 Wi-Fi 暂停」在 Windows 11 24H2 及以后要在「设置 → 隐私和安全性 → 位置」里打开定位服务、允许桌面应用访问位置（Windows 只把 Wi-Fi 名称给有定位权限的应用）。
+- **Requirements**: a Mac with Apple silicon (M1 or later), macOS 14 or later.
+- **Install**: download the latest `open-box-macos-<version>-arm64.dmg` from [Releases](https://github.com/wan-family-office/open-box-releases/releases) (or click the macOS icon in "Client downloads" under the panel's "Settings → App"), open it and drag Open-Box into "Applications". The App has no Apple developer signature, so the first launch says it cannot be verified: go to the bottom of "System Settings → Privacy & Security" and click "Open Anyway" (from macOS 15, right-clicking "Open" no longer gets around it). The first launch also asks for your computer password once to install a background service (used to set up the VPN and change the system DNS, restored automatically after disconnecting).
+- **Upgrade**: upgrade with one tap under "Settings → Check for updates" in the App, without clicking "Open Anyway" again; if the background service has changed, you will be asked for your computer password again.
+- **Uninstall**: App "Settings → Uninstall Open-Box".
+- "Pause VPN on trusted Wi-Fi" requires allowing the App to use location (macOS only gives the Wi-Fi name to apps with location permission).
 
-首页（节点分流）、代理 · 策略（本地分流）、连接 · 路由、设置：
+Home (Node routing), Proxies → Policies (Local routing), Traffic → Route, Settings:
 
 <p>
-  <img src="docs/pic/win-home.webp" alt="Windows 首页" width="45%">
-  <img src="docs/pic/win-proxies.webp" alt="Windows 代理 · 策略" width="45%">
+  <img src="docs/pic/mac-home.webp" alt="macOS Home" width="45%">
+  <img src="docs/pic/mac-proxies.webp" alt="macOS Proxies → Policies" width="45%">
 </p>
 <p>
-  <img src="docs/pic/win-route.webp" alt="Windows 连接 · 路由" width="45%">
-  <img src="docs/pic/win-settings.webp" alt="Windows 设置" width="45%">
+  <img src="docs/pic/mac-route.webp" alt="macOS Traffic → Route" width="45%">
+  <img src="docs/pic/mac-settings.webp" alt="macOS Settings" width="45%">
 </p>
 
-### Linux 客户端
+### Windows client
 
-关掉窗口 App 还在后台，顶栏托盘图标的菜单里可以打开窗口、连接 / 断开、退出；退出 App 就断开 VPN。设置里有开机自启开关（默认关）。
+The App stays in the system tray at the bottom right: closing the window keeps it running in the background, left-clicking the icon opens the window, and the right-click menu lets you connect / disconnect and quit; quitting the App disconnects the VPN. Settings has a launch-at-startup switch (off by default).
 
-- **系统要求**：Ubuntu 22.04 / 24.04、Debian 12，64 位 x86（amd64），GNOME 或 KDE 桌面。GNOME 要有 AppIndicator 扩展才显示托盘图标（Ubuntu 自带；Debian 要装 `gnome-shell-extension-appindicator`），没有托盘时从应用列表再打开 Open-Box 就回到窗口。
-- **安装**：从 [Releases](https://github.com/wan-family-office/open-box-releases/releases) 下载最新的 `open-box-desktop-linux-<版本>-amd64.deb`（或在面板「设置 → 客户端」的「客户端下载」里点 Linux 图标），在下载目录里运行 `sudo apt install ./open-box-desktop-linux-<版本>-amd64.deb`，装好后在应用列表里打开 Open-Box。安装时会装一个后台服务（建立 VPN、接管系统 DNS 用，断开后自动还原）。
-- **升级**：在 App「设置 → 检查更新」里一键升级，不用输密码，装好后 App 自动重新打开。
-- **卸载**：App「设置 → 卸载 Open-Box」，或运行 `sudo apt purge open-box-desktop`。
-- 同一台电脑上装着路由器端 Open-Box（Debian / Ubuntu 版）、而且它的内核在跑时，App 不会连接，要先在它的面板里停止内核。
+- **Requirements**: Windows 10 / 11, 64-bit.
+- **Install**: download the latest `open-box-windows-<version>-x64-setup.exe` from [Releases](https://github.com/wan-family-office/open-box-releases/releases) (or click the Windows icon in "Client downloads" under the panel's "Settings → App") and double-click it to install. The installer has no code signature, so running it shows "Windows protected your PC": click "More info → Run anyway", then click "Yes" in User Account Control. Installation also installs a background service (used to set up the VPN).
+- **Upgrade**: upgrade with one tap under "Settings → Check for updates" in the App: click "Yes" once in User Account Control, and the App reopens automatically after installing.
+- **Uninstall**: App "Settings → Uninstall Open-Box", or uninstall Open-Box under Windows "Settings → Apps → Installed apps".
+- On Windows 11 24H2 and later, "Pause VPN on trusted Wi-Fi" requires turning on location services and allowing desktop apps to access location under "Settings → Privacy & security → Location" (Windows only gives the Wi-Fi name to apps with location permission).
 
-首页（节点分流）、代理 · 策略（本地分流）、连接 · 路由、设置：
+Home (Node routing), Proxies → Policies (Local routing), Traffic → Route, Settings:
 
 <p>
-  <img src="docs/pic/linux-home.webp" alt="Linux 首页" width="45%">
-  <img src="docs/pic/linux-proxies.webp" alt="Linux 代理 · 策略" width="45%">
+  <img src="docs/pic/win-home.webp" alt="Windows Home" width="45%">
+  <img src="docs/pic/win-proxies.webp" alt="Windows Proxies → Policies" width="45%">
 </p>
 <p>
-  <img src="docs/pic/linux-route.webp" alt="Linux 连接 · 路由" width="45%">
-  <img src="docs/pic/linux-settings.webp" alt="Linux 设置" width="45%">
+  <img src="docs/pic/win-route.webp" alt="Windows Traffic → Route" width="45%">
+  <img src="docs/pic/win-settings.webp" alt="Windows Settings" width="45%">
 </p>
 
-## 许可证
+### Linux client
 
-本仓库是 Wan Family 的 Open-Box 公开发布仓库：提供官方发行版、安装 / 升级 / 卸载及 Docker 部署脚本和使用文档，源码不在这里公开。Open-Box 自有程序适用根目录 [LICENSE](LICENSE)，未经许可禁止复制传播、再分发、反编译、制作换名衍生产品及绕过授权。上游 zashboard 的 MIT 代码、sing-box 内核及其他第三方组件继续遵守各自开源许可证；许可范围及历史许可说明见 [COPYRIGHT.md](COPYRIGHT.md)。
+Closing the window keeps the App running in the background; the tray icon menu in the top bar lets you open the window, connect / disconnect and quit; quitting the App disconnects the VPN. Settings has a launch-at-login switch (off by default).
+
+- **Requirements**: Ubuntu 22.04 / 24.04, Debian 12, 64-bit x86 (amd64), GNOME or KDE desktop. GNOME needs the AppIndicator extension to show the tray icon (built into Ubuntu; on Debian install `gnome-shell-extension-appindicator`); without a tray, open Open-Box again from the app list to get back to the window.
+- **Install**: download the latest `open-box-desktop-linux-<version>-amd64.deb` from [Releases](https://github.com/wan-family-office/open-box-releases/releases) (or click the Linux icon in "Client downloads" under the panel's "Settings → App"), run `sudo apt install ./open-box-desktop-linux-<version>-amd64.deb` in the download directory, and once installed, open Open-Box from the app list. Installation also installs a background service (used to set up the VPN and take over the system DNS, restored automatically after disconnecting).
+- **Upgrade**: upgrade with one tap under "Settings → Check for updates" in the App, with no password needed; the App reopens automatically after installing.
+- **Uninstall**: App "Settings → Uninstall Open-Box", or run `sudo apt purge open-box-desktop`.
+- If the router-side Open-Box (Debian / Ubuntu version) is installed on the same computer and its core is running, the App will not connect; stop the core in its panel first.
+
+Home (Node routing), Proxies → Policies (Local routing), Traffic → Route, Settings:
+
+<p>
+  <img src="docs/pic/linux-home.webp" alt="Linux Home" width="45%">
+  <img src="docs/pic/linux-proxies.webp" alt="Linux Proxies → Policies" width="45%">
+</p>
+<p>
+  <img src="docs/pic/linux-route.webp" alt="Linux Traffic → Route" width="45%">
+  <img src="docs/pic/linux-settings.webp" alt="Linux Settings" width="45%">
+</p>
+
+## License
+
+This is Wan Family's public Open-Box release repository: it provides the official releases, the install / upgrade / uninstall and Docker deployment scripts, and the documentation. The source code is not published here. Open-Box's own programs are governed by the root [LICENSE](LICENSE); copying or distributing, redistribution, decompilation, making renamed derivative products and circumventing licensing are prohibited without permission. Upstream zashboard's MIT code, the sing-box core and other third-party components remain under their respective open-source licenses; for the license scope and historical license notes, see [COPYRIGHT.md](COPYRIGHT.md).
