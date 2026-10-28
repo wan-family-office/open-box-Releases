@@ -414,9 +414,13 @@ fi
 # 安装/升级在断电或 OOM-kill 时可能来不及执行 EXIT trap，清理安装目录旁边留下的
 # 下载临时目录，避免下次安装因旧包占满持久化分区而再次失败。只匹配 Open-Box
 # 自己创建的隐藏目录，不碰用户在同一分区上的其它文件。
-for _tmp in ${UNINSTALL_TMP_PARENT:-$(dirname -- "$INSTALL_ROOT")}/.open-box-install.* ${UNINSTALL_TMP_PARENT:-$(dirname -- "$INSTALL_ROOT")}/.open-box-update.*; do
-  [ -e "$_tmp" ] || continue
-  safe_rm_rf "$_tmp"
+# Scan every temp-parent candidate (the same list as openbox_pick_tmp_parent): UNINSTALL_TMP_PARENT is not passed to the
+# relocated uninstall process, and an earlier install / update may have used a different parent.
+for _parent in ${OPENBOX_TMPDIR:+"$OPENBOX_TMPDIR"} "$(dirname -- "$INSTALL_ROOT")" /var/tmp /root /tmp; do
+  for _tmp in "$_parent"/.open-box-install.* "$_parent"/.open-box-update.* "$_parent"/.openbox-update.*.sh; do
+    [ -e "$_tmp" ] || continue
+    safe_rm_rf "$_tmp"
+  done
 done
 
 # ---------- 不重启 rpcd ----------
